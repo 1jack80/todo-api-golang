@@ -29,11 +29,9 @@ func setupMiddlewares(mux *chi.Mux) {
 		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 	}))
 	mux.Use(middleware.Logger)
-	mux.Use(middleware.CleanPath)
 }
 
 func (a *app) loginHandler(w http.ResponseWriter, r *http.Request) {
-	// user signs in with username and password
 	type credentials struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
@@ -47,12 +45,14 @@ func (a *app) loginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// create a new session and add it to the session list
-	a.createNewSession(creds.Username)
+	session_cookie := a.createNewSession(creds.Username)
 
-	fmt.Fprintf(w, "login sucess, \n %v+ \n %v+", creds, a.sessions)
+	http.SetCookie(w, &session_cookie)
+	fmt.Fprintf(w, "login sucess, \n\n %v+ \n\n", a.sessions)
 }
 
 func (a *app) logoutHandler(w http.ResponseWriter, r *http.Request) {
+	// on logout; set expiry time of session to now
 	fmt.Fprintf(w, "logout success")
 }
 
