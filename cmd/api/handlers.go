@@ -52,8 +52,13 @@ func (a *app) loginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *app) logoutHandler(w http.ResponseWriter, r *http.Request) {
-	// on logout; set expiry time of session to now
-	fmt.Fprintf(w, "logout success")
+	old_cookie, err := r.Cookie("session_token")
+	if err != nil {
+		http.Error(w, "Not logged in", http.StatusBadRequest)
+		return
+	}
+	delete(a.sessions, old_cookie.Value)
+	fmt.Fprintf(w, "logout sucess, \n\n %v+ \n\n", a.sessions)
 }
 
 func (a *app) signupHandler(w http.ResponseWriter, r *http.Request) {

@@ -9,7 +9,6 @@ import (
 )
 
 type session struct {
-	session_id []byte
 	username   string
 	expiryTime time.Time
 }
