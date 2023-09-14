@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/1jack80/guardian"
 	"github.com/1jack80/todo-api/models"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/v5/middleware"
@@ -20,12 +21,12 @@ func (a *api) routes() *chi.Mux {
 	mux.Group(func(r chi.Router) {
 		r.Post("/signup", a.signupHandler)
 		r.Post("/login", a.loginHandler)
-		// r.Post("logout", a.logoutHandler)
 	})
 
 	// protected routes
 	mux.Group(func(r chi.Router) {
 		r.Use(a.sessions.Middleware)
+		r.Post("/logout", a.logoutHandler)
 	})
 	return mux
 }
@@ -101,4 +102,32 @@ func (a *api) loginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	http.SetCookie(w, &cookie)
 	jsonResponse(w, http.StatusOK, "Login successful")
+}
+
+func (a *api) logoutHandler(w http.ResponseWriter, r *http.Request) {
+	ctxVal := r.Context().Value(a.sessions.ContextKey())
+
+	session, ok := ctxVal.(guardian.Session)
+	if !ok {
+		jsonResponse(w, http.StatusInternalServerError, "")
+		return
+	}
+
+	err := a.sessions.InvalidateSession(session.ID)
+	if !ok {
+		a.errLog.Println(err)
+		jsonResponse(w, http.StatusInternalServerError, "")
+		return
+	}
+
+	cookie, err := a.sessions.CreateCookie(session.ID)
+	if err != nil {
+		a.errLog.Println(err)
+		jsonResponse(w, http.StatusInternalServerError, "")
+		return
+	}
+	cookie.Value = ""
+	http.SetCookie(w, &cookie)
+	jsonResponse(w, http.StatusOK, "logout successful")
+
 }
