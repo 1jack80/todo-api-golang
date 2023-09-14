@@ -14,6 +14,8 @@ type User struct {
 	ID       int    `json:"id"`
 	Username string `json:"username"`
 	Password string `json:"password"`
+	Created  string `json:"created"`
+	Updated  string `json:"updated"`
 }
 
 type userModel struct {
@@ -37,4 +39,13 @@ func (u *userModel) Create(user User) error {
 		}
 	}
 	return err
+}
+
+func (u *userModel) GetByUsername(username string) (User, error) {
+	user := User{}
+	stmt := "select * from Users where username=?"
+
+	row := u.db.QueryRow(stmt, username)
+	err := row.Scan(&user.ID, &user.Username, &user.Password, &user.Created, &user.Updated)
+	return user, err
 }
