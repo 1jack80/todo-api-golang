@@ -17,7 +17,7 @@ type api struct {
 }
 
 func main() {
-	dsn := "todo_api:todoapi_mysqldb@/TodoDB"
+	dsn := "todo_api:todoapi_mysqldb@/TodoDB?parseTime=true"
 	addr := "127.0.0.1:8080"
 
 	infoLog := log.New(os.Stdout, "Info ~ ", log.Ltime|log.Ldate)
