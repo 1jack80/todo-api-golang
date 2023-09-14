@@ -4,7 +4,6 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
-	"fmt"
 	"net/http"
 )
 
@@ -17,9 +16,9 @@ func readJsonFromReq(r *http.Request, objPointer interface{}) error {
 
 func jsonResponse(w http.ResponseWriter, statusCode int, msg interface{}) {
 	response := struct {
-		Status string `json:"status"`
-		Msg    string `json:"msg"`
-	}{Status: http.StatusText(statusCode), Msg: fmt.Sprintf("%+v", msg)}
+		Status string      `json:"status"`
+		Msg    interface{} `json:"msg"`
+	}{Status: http.StatusText(statusCode), Msg: msg}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
