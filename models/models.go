@@ -8,8 +8,9 @@ import (
 )
 
 type Models struct {
-	db   *sql.DB
-	User userModel
+	db    *sql.DB
+	User  userModel
+	Todos todoModel
 }
 
 var ErrDuplicateUsername = errors.New("models err: duplicate username ")
@@ -22,7 +23,8 @@ func Init(dsn string) (Models, error) {
 	}
 	// todo: see if there is a better way to handle the db connectin pool without passing it around
 	return Models{
-		db:   db,
-		User: userModel{db: db},
+		db:    db,
+		User:  userModel{db: db},
+		Todos: todoModel{db: db},
 	}, err
 }
