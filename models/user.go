@@ -4,6 +4,10 @@ import (
 	"crypto/sha256"
 	"database/sql"
 	"encoding/hex"
+	"errors"
+	"strings"
+
+	"github.com/go-sql-driver/mysql"
 )
 
 type User struct {
@@ -26,5 +30,11 @@ func (u *userModel) Create(user User) error {
 	strPass := hex.EncodeToString(binPass[:])
 
 	_, err := u.db.Exec(stmt, user.Username, strPass)
+	var mySQLError *mysql.MySQLError
+	if errors.As(err, &mySQLError) {
+		if mySQLError.Number == 1062 && strings.Contains(mySQLError.Message, "Users.username") {
+			return ErrDuplicateUsername
+		}
+	}
 	return err
 }

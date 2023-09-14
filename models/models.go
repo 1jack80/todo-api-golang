@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql"
+	"errors"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -10,6 +11,8 @@ type Models struct {
 	db   *sql.DB
 	User userModel
 }
+
+var ErrDuplicateUsername = errors.New("models err: duplicate username ")
 
 // connect to the database using the provided dsn
 func Init(dsn string) (Models, error) {
