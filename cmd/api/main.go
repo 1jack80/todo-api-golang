@@ -5,13 +5,15 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/1jack80/guardian"
 	"github.com/1jack80/todo-api/models"
 )
 
 type api struct {
-	infoLog *log.Logger
-	errLog  *log.Logger
-	models  models.Models
+	infoLog  *log.Logger
+	errLog   *log.Logger
+	models   models.Models
+	sessions guardian.Manager
 }
 
 func main() {
@@ -26,10 +28,17 @@ func main() {
 		errLog.Fatalf("model initialization failed: %v", err)
 	}
 
+	store := guardian.NewInMemoryStore()
+	sessionManager, err := guardian.NewManager("todoMan", store)
+	if err != nil {
+		errLog.Fatal(err)
+	}
+
 	app := api{
-		infoLog: infoLog,
-		errLog:  errLog,
-		models:  models,
+		infoLog:  infoLog,
+		errLog:   errLog,
+		models:   models,
+		sessions: sessionManager,
 	}
 
 	server := http.Server{

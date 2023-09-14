@@ -7,7 +7,8 @@ import (
 )
 
 type Models struct {
-	db *sql.DB
+	db   *sql.DB
+	User userModel
 }
 
 // connect to the database using the provided dsn
@@ -16,5 +17,9 @@ func Init(dsn string) (Models, error) {
 	if err != nil {
 		return Models{}, err
 	}
-	return Models{db: db}, err
+	// todo: see if there is a better way to handle the db connectin pool without passing it around
+	return Models{
+		db:   db,
+		User: userModel{db: db},
+	}, err
 }
