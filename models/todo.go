@@ -68,3 +68,15 @@ func (t *todoModel) Create(todo Todo) error {
 	_, err := t.db.Exec(stmt, todo.Title, todo.Content, todo.Completed, todo.UserID)
 	return err
 }
+
+func (t *todoModel) Delete(todoID int, userID int) error {
+	stmt := "delete from Todos where id = ? and userID = ? "
+	_, err := t.db.Exec(stmt, todoID, userID)
+	return err
+}
+
+func (t *todoModel) Patch(todo Todo, userID int) error {
+	stmt := "update Todos set title=?, content=?, completed=? where id = ? and userID =?"
+	_, err := t.db.Exec(stmt, todo.Title, todo.Content, todo.Completed, todo.ID, todo.UserID)
+	return err
+}
