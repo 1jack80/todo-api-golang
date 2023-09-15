@@ -5,6 +5,8 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"net/http"
+
+	"github.com/1jack80/guardian"
 )
 
 // decodes the json object into the object
@@ -30,4 +32,25 @@ func comparePasswordAndHash(password string, hash string) bool {
 	strHash := hex.EncodeToString(binPass[:])
 
 	return (strHash == hash)
+}
+
+func (a *api) getUserIDFromReqContext(r *http.Request) int {
+	ctxVal := r.Context().Value(a.sessions.ContextKey())
+	session, ok := ctxVal.(guardian.Session)
+	if !ok {
+		a.errLog.Printf("unable to get session data\n")
+		return -1
+	}
+	userIDstr, ok := session.Data["userID"]
+	if !ok {
+		a.errLog.Printf("user id was not found in session data\n")
+		return -1
+	}
+
+	userID, ok := userIDstr.(int)
+	if !ok {
+		a.errLog.Printf("usersID is not of type int")
+		return -1
+	}
+	return userID
 }
